@@ -38,7 +38,7 @@ class Zone(ABC):
     def is_passable(self) -> bool:
         """By default the possability to pass is True (except blocked Zone)."""
         return True
-    
+
     def is_prioritised(self) -> bool:
         """By default value of priorisation is False (except priority Zone)."""
         return False
@@ -86,4 +86,3 @@ class PriorityZone(Zone):
     def is_prioritised(self) -> bool:
         """Priority Zone are prioritised ways"""
         return True
-
