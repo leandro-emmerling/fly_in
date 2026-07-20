@@ -6,6 +6,7 @@ from zone import Zone, NormalZone, BlockedZone, RestrictedZone, PriorityZone
 from connection import Connection
 from map import Map
 from error import ParserError
+from sys import exit
 
 
 class Parser:
@@ -32,14 +33,44 @@ class Parser:
         }
 
     def parse(self, filepath: str) -> Map:
+        with open(filepath) as file:
+            for line_number, line in enumerate(file, start=1):
+                if line.startswith("#") or not line.rstrip():
+                    continue
+                raw: list = line.split(":", 1)
+                prefix, rest = raw
+                rest = rest.rstrip()
+                handler = self.handlers.get(prefix)
+                if handler is None:
+                    raise ParserError(f"Line {line_number}: No valid prefix! ({prefix})")
+                else:
+                    handler(rest, line_number, prefix)
+
+                
+
+    def _parse_nb_drones(self, line: str, line_number: int, _prefix: str) -> None:
+        if self.nb_drones is not None:
+            raise ParserError(f"Line {line_number}: nb_drones defined more than once!")
+        try:
+            line_int: int = int(line)
+        except ValueError:
+            raise ParserError(f"Line {line_number}: nb_drones must be a valid Integer!")
+        if line_int <= 0:
+            raise ParserError(f"Line {line_number}: nb_drones must be greater than Zero!")
+        self.nb_drones = line_int
+
+    def _parse_zone(self, line: str, line_number: int, prefix: str) -> None:
+        print(line, line_number)
+        sliced_line: list[str] = line.split("[", 1)
+
+    def _parse_connection(self, line: str, line_number: int,  prefix: str) -> None:
         pass
 
-    def _parse_nb_drones(self, line: str, line_number: int) -> None:
-        pass
 
-    def _parse_zone(self, line: str, line_number: int) -> None:
-        sliced_line: list[str] = []
-        sliced_line = line.split("[", 1)
-
-    def _parse_connection(self, line: str, line_number: int) -> None:
-        pass
+if __name__ == "__main__":
+    p = Parser()
+    try:
+        p.parse("config.txt")
+    except ParserError as e:
+        print(f"Error: {e}")
+        exit(1)
