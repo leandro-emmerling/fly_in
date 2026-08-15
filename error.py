@@ -8,3 +8,7 @@ class MapValidationError(Exception):
 
 class ParserError(Exception):
     """Raised when the input file violates the expected format."""
+
+
+class PathNotFoundError(Exception):
+    """Raised when no valid path exists between two zones."""
