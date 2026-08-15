@@ -55,7 +55,7 @@ class Pathfinder:
                     distances[entry.neighbor] = new_cost
                     previous[entry.neighbor] = current
         if distances[end] == float("inf"):
-            raise PathNotFoundError("No valid path found!")
+            raise PathNotFoundError("No valid path to the end-zone found!")
         path: list[Zone] = [end]
         current = end
         while current is not start:
