@@ -3,6 +3,7 @@ PYTHON = $(VENV)/bin/python3
 PIP = $(VENV)/bin/pip
 FLAKE8 = $(VENV)/bin/flake8
 MYPY = $(VENV)/bin/mypy
+EXCLUDE = venv,__pycache__,.mypy_cache
 
 MAIN = main.py
 CONFIG = config.txt
@@ -24,9 +25,9 @@ clean:
 	find . -name "*.pyc" -delete
 
 lint:
-	$(FLAKE8) .
-	$(MYPY) . --warn-return-any --warn-unused-ignores --ignore-missing-imports --disallow-untyped-defs --check-untyped-defs
+	$(FLAKE8) . --exclude=$(EXCLUDE)
+	$(MYPY) . --exclude=$(EXCLUDE) --warn-return-any --warn-unused-ignores --ignore-missing-imports --disallow-untyped-defs --check-untyped-defs
 
 lint-strict:
-	$(FLAKE8) .
-	$(MYPY) . --strict
+	$(FLAKE8) . --exclude=$(EXCLUDE)
+	$(MYPY) . --exclude=$(EXCLUDE)--strict

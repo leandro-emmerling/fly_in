@@ -20,7 +20,7 @@ class Pathfinder:
         self.adjacency = self._build_adjacency()
 
     def find_path(self, start: Zone, end: Zone) -> list[Zone]:
-        """Finds the cheapest path from start to end using Dijkstra's algorithm.
+        """Find the cheapest path from start to end using Dijkstra's algorithm.
 
         Args:
             start: The zone to start from.
@@ -68,7 +68,6 @@ class Pathfinder:
             path.append(current)
         path.reverse()
         return path
-
 
     def _build_adjacency(self) -> dict[Zone, list[AdjacencyEntry]]:
         """Builds an adjacency map from each zone to its reachable neighbors.

@@ -16,9 +16,8 @@ if __name__ == "__main__":
         print(f"Error: {e}")
         exit(1)
     except PathNotFoundError as e:
-        print(f"No path: ")
+        print(f"No path: {e}")
         exit(1)
-
     print("Path found:")
     print(" -> ".join(zone.name for zone in path))
     print(f"Total cost: {sum(zone.movement_cost() for zone in path[1:])}")
