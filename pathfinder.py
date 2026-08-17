@@ -35,13 +35,13 @@ class Pathfinder:
         """
         if start is end:
             return [start]
-        distances: dict[Zone, float] = {
-            zone: float("inf") for zone in self.map.zones.values()}
-        distances[start] = 0
-        previous: dict[Zone, float] = {}
+        distances: dict[Zone, tuple[float, int]] = {
+            zone: (float("inf"), 0) for zone in self.map.zones.values()}
+        distances[start] = (0, 0)
+        previous: dict[Zone, Zone] = {}
         unvisited: set[Zone] = {zone for zone in self.map.zones.values()}
         while unvisited:
-            current: Zone = min(unvisited, key=lambda zone: distances[zone])
+            current: Zone = min(unvisited, key=lambda zone: distances[zone][0])
             unvisited.remove(current)
             if current is end:
                 break
@@ -50,11 +50,16 @@ class Pathfinder:
                     continue
                 if not entry.neighbor.is_passable():
                     continue
-                new_cost: float = distances[current] + entry.cost
-                if new_cost < distances[entry.neighbor]:
-                    distances[entry.neighbor] = new_cost
+                new_cost: float = distances[current][0] + entry.cost
+                new_priority_score = (
+                    distances[current][1] + (
+                        -1 if entry.neighbor.is_prioritised() else 0)
+                    )
+                new_total = (new_cost, new_priority_score)
+                if new_total < distances[entry.neighbor]:
+                    distances[entry.neighbor] = new_total
                     previous[entry.neighbor] = current
-        if distances[end] == float("inf"):
+        if distances[end][0] == float("inf"):
             raise PathNotFoundError("No valid path to the end-zone found!")
         path: list[Zone] = [end]
         current = end
