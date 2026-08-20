@@ -34,5 +34,13 @@ class Simulation:
         return drones
 
     def _compute_initial_paths(self) -> dict[Drone, list[Zone]]:
-        """Compute the initial cheapest path for every drone."""
-        ...
+        """Compute the shared cheapest path and assigns it to every drone.
+
+        Returns:
+            A dict mapping each Drone to its planned route (list of Zones).
+
+        Raises:
+            PathNotFoundError: If no path exists between start and end.
+        """
+        path = self.pathfinder.find_path(self.map.start, self.map.end)
+        return {drone: path.copy() for drone in self.drones}
