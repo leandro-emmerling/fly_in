@@ -4,13 +4,15 @@
 from zone import Zone
 from map import Map
 from typing import NamedTuple
+from connection import Connection
 from error import PathNotFoundError
 
 
 class AdjacencyEntry(NamedTuple):
-    """A single reachable neighbor with the cost to enter it"""
+    """A single reachable neighbor with the cost to enter it."""
     neighbor: Zone
     cost: int
+    connection: Connection
 
 
 class Pathfinder:
@@ -83,7 +85,11 @@ class Pathfinder:
             zone_a = connection.zone_a
             zone_b = connection.zone_b
             adjacency[zone_a].append(
-                AdjacencyEntry(neighbor=zone_b, cost=zone_b.movement_cost()))
+                AdjacencyEntry(
+                    neighbor=zone_b, cost=zone_b.movement_cost(),
+                    connection=connection))
             adjacency[zone_b].append(
-                AdjacencyEntry(neighbor=zone_a, cost=zone_a.movement_cost()))
+                AdjacencyEntry(
+                    neighbor=zone_a, cost=zone_a.movement_cost(),
+                    connection=connection))
         return adjacency
