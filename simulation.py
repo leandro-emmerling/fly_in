@@ -23,7 +23,7 @@ class Simulation:
         self.paths: dict[Drone, list[Zone]] = self._compute_initial_paths()
         self.zone_occupancy: dict[Zone, int] = self._count_zone_occupancy()
         self.connection_occupancy: dict[Connection, int] = (
-            self._count_connection_occupancy())
+            self._compute_connection_occupancy())
 
     def _create_drones(self) -> list[Drone]:
         """Create nb_drones Drone objects, all starting at map.start.
@@ -71,7 +71,7 @@ class Simulation:
                 if move is not None:
                     turn_moves.append(move)
             turns.append(turn_moves)
-            self.connection_occupancy = self._count_connection_occupancy()
+            self.connection_occupancy = self._compute_connection_occupancy()
         return turns
 
     def _advance_drone(self, drone: Drone) -> str | None:
@@ -85,14 +85,31 @@ class Simulation:
             The right formatted String for the Output or 'None' if the drone
             is not able to move.
         """
+        if drone.in_transit_to is not None:
+            restricted_zone: Zone = drone.in_transit_to
+            drone.current_zone = restricted_zone
+            drone.in_transit_to = None
+            return f"{drone.drone_id}-{restricted_zone.name}"
+
         cur_ind: int = self.paths[drone].index(drone.current_zone)
         next_zone: Zone = self.paths[drone][cur_ind + 1]
-
         connect = next(
             entry for entry in self.pathfinder.adjacency[drone.current_zone]
             if entry.neighbor is next_zone).connection
 
-        if (self.zone_occupancy[next_zone] < next_zone.max_drones) and (
+        if next_zone.movement_cost() == 2:
+            if (self.zone_occupancy[next_zone] < next_zone.max_drones) and (
+                self.connection_occupancy[connect] < connect.max_link_capacity
+            ):
+                self.zone_occupancy[drone.current_zone] -= 1
+                self.zone_occupancy[next_zone] += 1
+                self.connection_occupancy[connect] += 1
+                drone.in_transit_to = next_zone
+                return (f"{drone.drone_id}-"
+                        f"{connect.zone_a.name}-{connect.zone_b.name}")
+            else:
+                return None
+        elif (self.zone_occupancy[next_zone] < next_zone.max_drones) and (
             self.connection_occupancy[connect] < connect.max_link_capacity
         ):
             self.zone_occupancy[drone.current_zone] -= 1
@@ -115,11 +132,29 @@ class Simulation:
             occupancy[drone.current_zone] += 1
         return occupancy
 
-    def _count_connection_occupancy(self) -> dict[Connection, int]:
-        """Initialize how many drones occupy each connection with zero.
+    def _compute_connection_occupancy(self) -> dict[Connection, int]:
+        """Counts how many drones occupy each connection, hold values
+        of 'in_transit'-connection and initialize it with zero.
 
         Returns:
             A dict with the connection and the number of drones
-            (here initialized with 0).
+            (initialized with 0).
         """
-        return {connection: 0 for connection in self.map.connections}
+        in_transit_connections: set[Connection] = set()
+        for drone in self.drones:
+            if drone.in_transit_to is None:
+                continue
+            connection = next(
+                entry for entry in self.pathfinder.adjacency[drone.current_zone]
+                if entry.neighbor is drone.in_transit_to
+            ).connection
+            in_transit_connections.add(connection)
+        if not in_transit_connections:
+            return {connection: 0 for connection in self.map.connections}
+        new_occupancy: dict[Connection, int] = {}
+        for con in self.map.connections:
+            if con in in_transit_connections:
+                new_occupancy[con] = self.connection_occupancy[con]
+            else:
+                new_occupancy[con] = 0
+        return new_occupancy
