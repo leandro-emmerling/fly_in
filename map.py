@@ -27,6 +27,7 @@ class Map:
         self.start: Zone = start
         self.end: Zone = end
         self.validate()
+        self._apply_special_zone_rules()
 
     def validate(self) -> None:
         """Validation of map object if the arguments are solid."""
@@ -46,3 +47,13 @@ class Map:
                 seen_pairs.add(pair)
         if errors:
             raise MapValidationError("\n".join(errors))
+
+    def _apply_special_zone_rules(self) -> None:
+        """Sets max_drones for start and end to nb_drones.
+
+        Start and end zones are exempt from normal capacity limits:
+        all drones may begin there, and multiple drones may arrive
+        at the end simultaneously.
+        """
+        self.start.max_drones = self.nb_drones
+        self.end.max_drones = self.nb_drones
