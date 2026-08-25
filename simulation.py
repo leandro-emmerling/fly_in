@@ -94,8 +94,8 @@ class Simulation:
         cur_ind: int = self.paths[drone].index(drone.current_zone)
         next_zone: Zone = self.paths[drone][cur_ind + 1]
         connect = next(
-            entry for entry in self.pathfinder.adjacency[drone.current_zone]
-            if entry.neighbor is next_zone).connection
+            part for part in self.pathfinder.adjacency[drone.current_zone]
+            if part.neighbor is next_zone).connection
 
         if next_zone.movement_cost() == 2:
             if (self.zone_occupancy[next_zone] < next_zone.max_drones) and (
@@ -145,8 +145,8 @@ class Simulation:
             if drone.in_transit_to is None:
                 continue
             connection = next(
-                entry for entry in self.pathfinder.adjacency[drone.current_zone]
-                if entry.neighbor is drone.in_transit_to
+                part for part in self.pathfinder.adjacency[drone.current_zone]
+                if part.neighbor is drone.in_transit_to
             ).connection
             in_transit_connections.add(connection)
         if not in_transit_connections:
