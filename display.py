@@ -3,8 +3,18 @@
 
 from terminal_colors import TerminalColors
 from map import Map
-from simulation import MoveResult, Simulation
-from pathfinder import Pathfinder
+from simulation import MoveResult
+from typing import NamedTuple
+from zone import Zone
+import time
+
+
+class GridBounds(NamedTuple):
+    """Coordinates for the bounds of the grid."""
+    min_x: int
+    min_y: int
+    max_x: int
+    max_y: int
 
 
 class Display:
@@ -52,3 +62,81 @@ class Display:
         for turn_number, turn in enumerate(turns, start=1):
             formatted_moves = [self._format_move(move) for move in turn]
             print(f"Turn {turn_number}:", *formatted_moves)
+
+    def _get_grid_bounds(self) -> GridBounds:
+        """Calculates the smallest x/y coordinates and the highest x/y
+        coordinates to get the bounds of the grid.
+
+        Returns:
+            A GridBounds instance with its min. and max. x/y coordinates.
+        """
+        zones = self.map.zones.values()
+        min_x = min(zones, key=lambda zone: zone.x).x
+        min_y = min(zones, key=lambda zone: zone.y).y
+        max_x = max(zones, key=lambda zone: zone.x).x
+        max_y = max(zones, key=lambda zone: zone.y).y
+        return GridBounds(min_x, min_y, max_x, max_y)
+
+    def _build_grid(self, drone_state: dict[str, Zone]) -> list[list[str]]:
+        """Builds a 2D grid from the map zones and drone positions.
+
+        Args:
+            drone_state: A dict mapping each drone_id to its current zone.
+
+        Returns:
+            A 2D list of colored strings representing the grid,
+            with zones at their normalized coordinates and drones
+            overlaid at their current positions.
+        """
+        min_x, min_y, max_x, max_y = self._get_grid_bounds()
+        width: int = max_x - min_x + 1
+        height: int = max_y - min_y + 1
+        grid: list[list[str]] = []
+        for y in range(height):
+            row: list[str] = []
+            for x in range(width):
+                row.append("  ")
+            grid.append(row)
+        for zone in self.map.zones.values():
+            grid[zone.y - min_y][zone.x - min_x] = (
+                self.colors.colorize(zone.display_symbol() + " ", zone.color)
+            )
+        for drone_id, zone in drone_state.items():
+            grid[zone.y - min_y][zone.x - min_x] = (
+                self.colors.colorize(drone_id[1:] + " ", self.colors.drone_color)
+            )
+        return grid
+
+    def display_grid(self) -> None:
+        """"Prints the map grid with a double-line border to the terminal."""
+        grid: list[list[str]] = self._build_grid()
+        width: int = len(grid[0])
+        print("╔" + "═" * (width * 2) + "╗")
+        for row in grid:
+            print("║" + "".join(row) + "║")
+        print("╚" + "═" * (width * 2) + "╝")
+
+    def display_animated(
+        self, turns: list[list[MoveResult]],
+        drone_states: list[dict[str, Zone]]) -> None:
+        """Displays the simulation turn by turn with an animated grid.
+
+        Args:
+            turns: The list of turns from Simulation.run()
+            drone_states: A list of drone position snapshots, one per turn.
+        """
+        bounds = self._get_grid_bounds()
+        height = bounds.max_y - bounds.min_y + 1
+        for turn_index, turn in enumerate(turns, start=1):
+            grid: list[list[str]] = self._build_grid(
+                drone_states[turn_index - 1])
+            width: int = len(grid[0])
+            formatted_moves = [self._format_move(move) for move in turn]
+            print(f"Turn {turn_index}:", *formatted_moves)
+            print("╔" + "═" * (width * 2) + "╗")
+            for row in grid:
+                print("║" + "".join(row) + "║")
+            print("╚" + "═" * (width * 2) + "╝")
+            time.sleep(1)
+            if turn_index < len(turns):
+                print(f"\033[{height + 3}A", end="")
