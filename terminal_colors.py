@@ -30,6 +30,7 @@ class TerminalColors:
             "maroon": "\033[38;5;88m"
         }
         self.reset: str = "\033[0m"
+        self.drone_color: str = "\033[38;5;82m"
         self._fallback_color: str = "\033[38;5;250m"
 
     def get_color(self, color_name: str | None) -> str:
