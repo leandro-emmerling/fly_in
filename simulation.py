@@ -66,14 +66,17 @@ class Simulation:
         path = self.pathfinder.find_path(self.map.start, self.map.end)
         return {drone: path.copy() for drone in self.drones}
 
-    def run(self) -> list[list[MoveResult]]:
+    def run(self) -> tuple[list[list[MoveResult]], list[dict[str, Zone]]]:
         """Runs the simulation turn by turn until every drone is delivered.
 
         Returns:
-            A list of turns; each turn is a list of MoveResult objects,
+            - A list of turns; each turn is a list of MoveResult objects,
             one for every drone that moved during that turn.
+            - A list of drone state snapshots, one per turn, mapping
+            each drone_id to its current zone.
         """
         turns: list[list[MoveResult]] = []
+        drone_states: list[dict[str, Zone]] = []
         while not all(drone.current_zone is drone.target
                       for drone in self.drones):
             turn_moves: list[MoveResult] = []
@@ -84,8 +87,10 @@ class Simulation:
                 if move is not None:
                     turn_moves.append(move)
             turns.append(turn_moves)
+            drone_states.append(
+                {drone.drone_id: drone.current_zone for drone in self.drones})
             self.connection_occupancy = self._compute_connection_occupancy()
-        return turns
+        return turns, drone_states
 
     def _advance_drone(self, drone: Drone) -> MoveResult | None:
         """Attempts to move a drone one step forward along its path.
