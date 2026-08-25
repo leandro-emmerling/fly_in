@@ -5,10 +5,12 @@ from parser import Parser
 from error import ParserError, MapValidationError, PathNotFoundError
 from pathfinder import Pathfinder
 from simulation import Simulation
+from terminal_colors import TerminalColors
 
 
 if __name__ == "__main__":
     turn_count = 0
+    tc = TerminalColors()
     try:
         p = Parser()
         game_map = p.parse("config.txt")
@@ -20,7 +22,7 @@ if __name__ == "__main__":
             print(f"Turn {turn_count}: ", end="")
             print(*turn)
     except (ParserError, MapValidationError) as e:
-        print(f"Error: {e}")
+        print(tc.colorize(f"Error: {e}", "red"))
         exit(1)
     except PathNotFoundError as e:
         print(f"No path: {e}")
