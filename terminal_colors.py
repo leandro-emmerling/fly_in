@@ -27,7 +27,8 @@ class TerminalColors:
             "gold": "\033[38;5;220m",
             "turquoise": "\033[38;5;80m",
             "violet": "\033[38;5;177m",
-            "maroon": "\033[38;5;88m"
+            "maroon": "\033[38;5;88m",
+            "drone": "\033[38;5;82m"
         }
         self.reset: str = "\033[0m"
         self.drone_color: str = "\033[38;5;82m"
