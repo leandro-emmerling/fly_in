@@ -48,8 +48,8 @@ class NormalZone(Zone):
     """Normal Zone class that inhiterates from Motherclass 'Zone'."""
 
     def display_symbol(self) -> str:
-        """Return the Symbol (' ') to dipslay the normal Zone."""
-        return (" ")
+        """Return the Symbol ('+') to dipslay the normal Zone."""
+        return ("+")
 
 
 class BlockedZone(Zone):
