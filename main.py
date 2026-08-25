@@ -6,27 +6,27 @@ from error import ParserError, MapValidationError, PathNotFoundError
 from pathfinder import Pathfinder
 from simulation import Simulation
 from terminal_colors import TerminalColors
+from display import Display
 
 
-if __name__ == "__main__":
-    turn_count = 0
+def main() -> None:
+    """Run the main program."""
     tc = TerminalColors()
     try:
-        p = Parser()
-        game_map = p.parse("config.txt")
-        pf = Pathfinder(game_map)
-        sim = Simulation(game_map, pf)
-        path = pf.find_path(game_map.start, game_map.end)
-        for turn in sim.run():
-            turn_count += 1
-            print(f"Turn {turn_count}: ", end="")
-            print(*turn)
+        parser = Parser()
+        map = parser.parse("config.txt")
+        pathfinder = Pathfinder(map)
+        simulation = Simulation(map, pathfinder)
+        display = Display(map)
+        turns = simulation.run()
+        display.display_turns(turns)
     except (ParserError, MapValidationError) as e:
         print(tc.colorize(f"Error: {e}", "red"))
         exit(1)
     except PathNotFoundError as e:
-        print(f"No path: {e}")
+        print(tc.colorize(f"No path: {e}", "red"))
         exit(1)
-    print("Path found:")
-    print(" -> ".join(zone.name for zone in path))
-    print(f"Total cost: {sum(zone.movement_cost() for zone in path[1:])}")
+
+
+if __name__ == "__main__":
+    main()
