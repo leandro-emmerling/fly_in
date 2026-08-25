@@ -6,6 +6,19 @@ from map import Map
 from drone import Drone
 from zone import Zone
 from connection import Connection
+from typing import NamedTuple
+
+
+class MoveResult(NamedTuple):
+    """Information about a single drone's movement in a turn.
+
+    Exactly one of `zone` or `connection` is set, depending on
+    whether the drone completed a normal move or departed toward
+    a restricted zone.
+    """
+    drone_id: str
+    zone: Zone | None
+    connection: Connection | None
 
 
 class Simulation:
@@ -53,17 +66,17 @@ class Simulation:
         path = self.pathfinder.find_path(self.map.start, self.map.end)
         return {drone: path.copy() for drone in self.drones}
 
-    def run(self) -> list[list[str]]:
+    def run(self) -> list[list[MoveResult]]:
         """Runs the simulation turn by turn until every drone is delivered.
 
         Returns:
-            A list of turns; each turn is a list of Movement strings in
-            the format "D<id>-<zone>" for every drone that moved.
+            A list of turns; each turn is a list of MoveResult objects,
+            one for every drone that moved during that turn.
         """
-        turns: list[list[str]] = []
+        turns: list[list[MoveResult]] = []
         while not all(drone.current_zone is drone.target
                       for drone in self.drones):
-            turn_moves: list[str] = []
+            turn_moves: list[MoveResult] = []
             for drone in self.drones:
                 if drone.current_zone is drone.target:
                     continue
@@ -74,23 +87,23 @@ class Simulation:
             self.connection_occupancy = self._compute_connection_occupancy()
         return turns
 
-    def _advance_drone(self, drone: Drone) -> str | None:
-        """Gets the next zone from the current zone to generate the right
-        output format for a single drone with its given ID.
+    def _advance_drone(self, drone: Drone) -> MoveResult | None:
+        """Attempts to move a drone one step forward along its path.
 
         Args:
             drone: the Drone object which is checked.
 
         Returns:
-            The right formatted String for the Output or 'None' if the drone
-            is not able to move.
+            A MoveResult object with the drone_id and the Zone or Connection
+            of its turn, or 'None' if the drone is not able to move.
         """
         if drone.in_transit_to is not None:
             restricted_zone: Zone = drone.in_transit_to
             drone.current_zone = restricted_zone
             drone.in_transit_to = None
-            return f"{drone.drone_id}-{restricted_zone.name}"
-
+            return MoveResult(
+                drone_id=drone.drone_id, zone=restricted_zone, connection=None
+                )
         cur_ind: int = self.paths[drone].index(drone.current_zone)
         next_zone: Zone = self.paths[drone][cur_ind + 1]
         connect = next(
@@ -105,8 +118,9 @@ class Simulation:
                 self.zone_occupancy[next_zone] += 1
                 self.connection_occupancy[connect] += 1
                 drone.in_transit_to = next_zone
-                return (f"{drone.drone_id}-"
-                        f"{connect.zone_a.name}-{connect.zone_b.name}")
+                return MoveResult(
+                    drone_id=drone.drone_id, zone=None, connection=connect
+                )
             else:
                 return None
         elif (self.zone_occupancy[next_zone] < next_zone.max_drones) and (
@@ -116,7 +130,9 @@ class Simulation:
             self.connection_occupancy[connect] += 1
             self.zone_occupancy[next_zone] += 1
             drone.current_zone = next_zone
-            return f"{drone.drone_id}-{drone.current_zone.name}"
+            return MoveResult(
+                drone_id=drone.drone_id, zone=drone.current_zone,
+                connection=None)
         else:
             return None
 
