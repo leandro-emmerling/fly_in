@@ -133,7 +133,7 @@ class Display:
             elif count > 0:
                 grid[zone.y - min_y][zone.x - min_x] = (
                     self.colors.colorize(
-                        str(count), zone.color)
+                        "9+", zone.color)
                 )
         return grid
 
