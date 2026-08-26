@@ -101,10 +101,16 @@ class Display:
             grid[zone.y - min_y][zone.x - min_x] = (
                 self.colors.colorize(zone.display_symbol() + " ", zone.color)
             )
-        for drone_id, zone in drone_state.items():
-            grid[zone.y - min_y][zone.x - min_x] = (
-                self.colors.colorize(drone_id[1:] + " ", self.colors.drone_color)
-            )
+        occupancy: dict[Zone, int] = {
+            zone: 0 for zone in self.map.zones.values()}
+        for zone in drone_state.values():
+            occupancy[zone] += 1
+        for zone, count in occupancy.items():
+            if count > 0:
+                grid[zone.y - min_y][zone.x - min_x] = (
+                    self.colors.colorize(
+                        str(count) + " ", self.colors.drone_color)
+                )
         return grid
 
     def display_grid(self) -> None:
@@ -125,14 +131,13 @@ class Display:
             turns: The list of turns from Simulation.run()
             drone_states: A list of drone position snapshots, one per turn.
         """
-        bounds = self._get_grid_bounds()
-        height = bounds.max_y - bounds.min_y + 1
         for turn_index, turn in enumerate(turns, start=1):
             grid: list[list[str]] = self._build_grid(
                 drone_states[turn_index - 1])
+            height: int = len(grid)
             width: int = len(grid[0])
             formatted_moves = [self._format_move(move) for move in turn]
-            print(f"Turn {turn_index}:", *formatted_moves)
+            print(f"Turn {turn_index}:", *formatted_moves, end="\033[K\n")
             print("╔" + "═" * (width * 2) + "╗")
             for row in grid:
                 print("║" + "".join(row) + "║")
