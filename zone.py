@@ -48,16 +48,16 @@ class NormalZone(Zone):
     """Normal Zone class that inhiterates from Motherclass 'Zone'."""
 
     def display_symbol(self) -> str:
-        """Return the Symbol ('+') to dipslay the normal Zone."""
-        return ("+")
+        """Return the Symbol ('N') to dipslay the normal Zone."""
+        return ("N")
 
 
 class BlockedZone(Zone):
     """Blocked Zone class that inhiterates from Motherclass 'Zone'."""
 
     def display_symbol(self) -> str:
-        """Return the Symbol ('#') to dipslay the blocked Zone."""
-        return ("#")
+        """Return the Symbol ('B') to dipslay the blocked Zone."""
+        return ("B")
 
     def is_passable(self) -> bool:
         """Blocked zone is no passable."""
@@ -68,8 +68,8 @@ class RestrictedZone(Zone):
     """Restriced Zone class that inhiterates from Motherclass 'Zone'."""
 
     def display_symbol(self) -> str:
-        """Return the Symbol ('^') to dipslay the restricted Zone."""
-        return ("^")
+        """Return the Symbol ('R') to dipslay the restricted Zone."""
+        return ("R")
 
     def movement_cost(self) -> int:
         """Restricted zones cost 2 turns to enter."""
@@ -80,8 +80,8 @@ class PriorityZone(Zone):
     """PriorityZone class that inhiterates from Motherclass 'Zone'."""
 
     def display_symbol(self) -> str:
-        """Return the Symbol ('*') to dipslay the priority Zone."""
-        return ("*")
+        """Return the Symbol ('P') to dipslay the priority Zone."""
+        return ("P")
 
     def is_prioritised(self) -> bool:
         """Priority Zone are prioritised ways"""
