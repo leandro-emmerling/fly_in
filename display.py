@@ -125,10 +125,15 @@ class Display:
         for zone in drone_state.values():
             occupancy[zone] += 1
         for zone, count in occupancy.items():
-            if count > 0:
+            if count > 0 and count < 10:
                 grid[zone.y - min_y][zone.x - min_x] = (
                     self.colors.colorize(
                         str(count) + " ", zone.color)
+                )
+            elif count > 0:
+                grid[zone.y - min_y][zone.x - min_x] = (
+                    self.colors.colorize(
+                        str(count), zone.color)
                 )
         return grid
 
