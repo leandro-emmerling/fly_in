@@ -76,6 +76,24 @@ class Display:
         max_x = max(zones, key=lambda zone: zone.x).x
         max_y = max(zones, key=lambda zone: zone.y).y
         return GridBounds(min_x, min_y, max_x, max_y)
+    
+    def _draw_connections(
+        self, grid: list[list[str]], min_x: int, min_y: int) -> None:
+        for connection in self.map.connections:
+            x1 = connection.zone_a.x - min_x
+            y1 = connection.zone_a.y - min_y
+            x2 = connection.zone_b.x - min_x
+            y2 = connection.zone_b.y - min_y
+            n = max(abs(x2-x1), abs(y2-y1)) - 1
+            for i in range(1, n + 1):
+                t = i / (n + 1)
+                px = round(x1 + t * (x2 - x1))
+                py = round(y1 + t * (y2 - y1))
+                if i % 2 == 0:
+                    color = connection.zone_a.color
+                else: 
+                    color = connection.zone_b.color
+                grid[py][px] = self.colors.colorize("• ", color)
 
     def _build_grid(self, drone_state: dict[str, Zone]) -> list[list[str]]:
         """Builds a 2D grid from the map zones and drone positions.
@@ -97,6 +115,7 @@ class Display:
             for x in range(width):
                 row.append("  ")
             grid.append(row)
+        self._draw_connections(grid, min_x, min_y)
         for zone in self.map.zones.values():
             grid[zone.y - min_y][zone.x - min_x] = (
                 self.colors.colorize(zone.display_symbol() + " ", zone.color)
@@ -109,18 +128,9 @@ class Display:
             if count > 0:
                 grid[zone.y - min_y][zone.x - min_x] = (
                     self.colors.colorize(
-                        str(count) + " ", self.colors.drone_color)
+                        str(count) + " ", zone.color)
                 )
         return grid
-
-    def display_grid(self) -> None:
-        """"Prints the map grid with a double-line border to the terminal."""
-        grid: list[list[str]] = self._build_grid()
-        width: int = len(grid[0])
-        print("╔" + "═" * (width * 2) + "╗")
-        for row in grid:
-            print("║" + "".join(row) + "║")
-        print("╚" + "═" * (width * 2) + "╝")
 
     def display_animated(
         self, turns: list[list[MoveResult]],
