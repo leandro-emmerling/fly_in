@@ -131,6 +131,8 @@ class Parser:
                 f"Line {line_number}: zone must be declared as "
                 f"'name x y' with optional '[metadata]'"
             )
+        if "-" in name:
+            raise ParserError(f"Line {line_number}: zone name '{name}' must not contain dashes!")
         if name in self.zones_by_name:
             raise ParserError(
                 f"Line {line_number}: zone '{name}' defined more than once!")
