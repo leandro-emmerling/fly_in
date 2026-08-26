@@ -124,12 +124,13 @@ class Display:
 
     def display_animated(
         self, turns: list[list[MoveResult]],
-        drone_states: list[dict[str, Zone]]) -> None:
+        drone_states: list[dict[str, Zone]], step: bool = False) -> None:
         """Displays the simulation turn by turn with an animated grid.
 
         Args:
             turns: The list of turns from Simulation.run()
             drone_states: A list of drone position snapshots, one per turn.
+            step: Flag for automatic or manuel turn steps
         """
         for turn_index, turn in enumerate(turns, start=1):
             grid: list[list[str]] = self._build_grid(
@@ -142,6 +143,10 @@ class Display:
             for row in grid:
                 print("║" + "".join(row) + "║")
             print("╚" + "═" * (width * 2) + "╝")
-            time.sleep(1)
+            if step:
+                input("Press Enter for next turn...")
+                print("\033[1A\033[K", end="")
+            else:
+                time.sleep(1)
             if turn_index < len(turns):
-                print(f"\033[{height + 3}A", end="")
+                print(f"\033[{height + 2}A", end="")

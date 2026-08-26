@@ -16,6 +16,9 @@ install:
 run:
 	$(PYTHON) $(MAIN) $(CONFIG)
 
+step:
+	$(PYTHON) $(MAIN) $(CONFIG) --step
+
 debug:
 	$(PYTHON) -m pdb $(MAIN) $(CONFIG)
 
