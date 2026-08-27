@@ -22,6 +22,9 @@ step:
 debug:
 	$(PYTHON) -m pdb $(MAIN) $(CONFIG)
 
+test:
+	$(PYTHON) test_fly_in.py
+
 clean:
 	find . -type d -name "__pycache__" -exec rm -rf {} +
 	find . -type d -name ".mypy_cache" -exec rm -rf {} +
