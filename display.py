@@ -76,7 +76,7 @@ class Display:
         max_x = max(zones, key=lambda zone: zone.x).x
         max_y = max(zones, key=lambda zone: zone.y).y
         return GridBounds(min_x, min_y, max_x, max_y)
-    
+
     def _draw_connections(
         self, grid: list[list[str]], min_x: int, min_y: int) -> None:
         for connection in self.map.connections:
@@ -91,7 +91,7 @@ class Display:
                 py = round(y1 + t * (y2 - y1))
                 if i % 2 == 0:
                     color = connection.zone_a.color
-                else: 
+                else:
                     color = connection.zone_b.color
                 grid[py][px] = self.colors.colorize("• ", color)
 
@@ -110,6 +110,7 @@ class Display:
         width: int = max_x - min_x + 1
         height: int = max_y - min_y + 1
         grid: list[list[str]] = []
+        colorize = self.colors.colorize
         for y in range(height):
             row: list[str] = []
             for x in range(width):
@@ -118,8 +119,11 @@ class Display:
         self._draw_connections(grid, min_x, min_y)
         for zone in self.map.zones.values():
             grid[zone.y - min_y][zone.x - min_x] = (
-                self.colors.colorize(zone.display_symbol() + " ", zone.color)
-            )
+                colorize(zone.display_symbol() + " ", zone.color))
+        grid[self.map.start.y - min_y][self.map.start.x - min_x] = (
+            colorize("S ", self.map.start.color))
+        grid[self.map.end.y - min_y][self.map.end.x - min_x] = (
+            colorize("E ", self.map.end.color))
         occupancy: dict[Zone, int] = {
             zone: 0 for zone in self.map.zones.values()}
         for zone in drone_state.values():
@@ -127,14 +131,10 @@ class Display:
         for zone, count in occupancy.items():
             if count > 0 and count < 10:
                 grid[zone.y - min_y][zone.x - min_x] = (
-                    self.colors.colorize(
-                        str(count) + " ", zone.color)
-                )
+                    colorize(str(count) + " ", zone.color))
             elif count > 0:
                 grid[zone.y - min_y][zone.x - min_x] = (
-                    self.colors.colorize(
-                        "9+", zone.color)
-                )
+                    colorize("9+", zone.color))
         return grid
 
     def display_animated(
