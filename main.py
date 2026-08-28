@@ -5,7 +5,7 @@ from parser import Parser
 from error import ParserError, MapValidationError, PathNotFoundError
 from pathfinder import Pathfinder
 from simulation import Simulation
-from colors import TerminalColors
+from terminal_colors import TerminalColors
 from terminal_display import TerminalDisplay
 import argparse
 
