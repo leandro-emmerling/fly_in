@@ -4,17 +4,8 @@
 from terminal_colors import TerminalColors
 from map import Map
 from simulation import MoveResult
-from typing import NamedTuple
 from zone import Zone
 import time
-
-
-class GridBounds(NamedTuple):
-    """Coordinates for the bounds of the grid."""
-    min_x: int
-    min_y: int
-    max_x: int
-    max_y: int
 
 
 class TerminalDisplay:
@@ -63,20 +54,6 @@ class TerminalDisplay:
             formatted_moves = [self._format_move(move) for move in turn]
             print(f"Turn {turn_number}:", *formatted_moves)
 
-    def _get_grid_bounds(self) -> GridBounds:
-        """Calculates the smallest x/y coordinates and the highest x/y
-        coordinates to get the bounds of the grid.
-
-        Returns:
-            A GridBounds instance with its min. and max. x/y coordinates.
-        """
-        zones = self.map.zones.values()
-        min_x = min(zones, key=lambda zone: zone.x).x
-        min_y = min(zones, key=lambda zone: zone.y).y
-        max_x = max(zones, key=lambda zone: zone.x).x
-        max_y = max(zones, key=lambda zone: zone.y).y
-        return GridBounds(min_x, min_y, max_x, max_y)
-
     def _draw_connections(
         self, grid: list[list[str]], min_x: int, min_y: int) -> None:
         for connection in self.map.connections:
@@ -106,7 +83,7 @@ class TerminalDisplay:
             with zones at their normalized coordinates and drones
             overlaid at their current positions.
         """
-        min_x, min_y, max_x, max_y = self._get_grid_bounds()
+        min_x, min_y, max_x, max_y = self.map.get_grid_bounds()
         width: int = max_x - min_x + 1
         height: int = max_y - min_y + 1
         grid: list[list[str]] = []
