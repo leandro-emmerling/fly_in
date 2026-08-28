@@ -5,8 +5,8 @@ from parser import Parser
 from error import ParserError, MapValidationError, PathNotFoundError
 from pathfinder import Pathfinder
 from simulation import Simulation
-from terminal_colors import TerminalColors
-from display import Display
+from colors import TerminalColors
+from terminal_display import TerminalDisplay
 import argparse
 
 
@@ -31,7 +31,7 @@ def main() -> None:
         map = file_parser.parse(args.config)
         pathfinder = Pathfinder(map)
         simulation = Simulation(map, pathfinder)
-        display = Display(map)
+        display = TerminalDisplay(map)
         turns, drone_states = simulation.run()
         display.display_animated(turns, drone_states, args.step)
     except (ParserError, MapValidationError) as e:
