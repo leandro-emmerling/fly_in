@@ -57,3 +57,17 @@ class Map:
         """
         self.start.max_drones = self.nb_drones
         self.end.max_drones = self.nb_drones
+
+    def get_grid_bounds(self) -> tuple[int, int, int, int]:
+        """Calculates the smallest x/y coordinates and the highest x/y
+        coordinates to get the bounds of the grid.
+
+        Returns:
+            A tuple instance with its min. and max. x/y coordinates.
+        """
+        zones = self.zones.values()
+        min_x = min(zones, key=lambda zone: zone.x).x
+        min_y = min(zones, key=lambda zone: zone.y).y
+        max_x = max(zones, key=lambda zone: zone.x).x
+        max_y = max(zones, key=lambda zone: zone.y).y
+        return min_x, min_y, max_x, max_y
