@@ -7,6 +7,7 @@ from pathfinder import Pathfinder
 from simulation import Simulation
 from terminal_colors import TerminalColors
 from terminal_display import TerminalDisplay
+from gui_display import GuiDisplay
 import argparse
 
 
@@ -20,6 +21,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("config", help="Path to the config file")
     parser.add_argument("--step", action="store_true",
                         help="Step through turns manually with Enter")
+    parser.add_argument("--gui", action="store_true",
+                        help="Run the gui interface")
     return parser.parse_args()
 
 def main() -> None:
@@ -31,9 +34,16 @@ def main() -> None:
         map = file_parser.parse(args.config)
         pathfinder = Pathfinder(map)
         simulation = Simulation(map, pathfinder)
-        display = TerminalDisplay(map)
         turns, drone_states = simulation.run()
-        display.display_animated(turns, drone_states, args.step)
+        if args.gui:
+            gui = GuiDisplay(map, args.step)
+            gui.display_animated(turns, drone_states)
+            gui.run()
+        else:
+            terminal = TerminalDisplay(map)
+            terminal.display_animated(turns, drone_states, args.step)
+
+
     except (ParserError, MapValidationError) as e:
         print(tc.colorize(f"Error: {e}", "red"))
         exit(1)

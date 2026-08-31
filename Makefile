@@ -13,11 +13,21 @@ install:
 	$(PIP) install --upgrade pip
 	$(PIP) install -r requirements.txt
 
+#Run with Terminal grid and automatic turn steps.
 run:
 	$(PYTHON) $(MAIN) $(CONFIG)
 
+#Run with Terminal grid and manual turn steps.
 step:
 	$(PYTHON) $(MAIN) $(CONFIG) --step
+
+#Run with GUI grid and automatic turn steps.
+gui:
+	$(PYTHON) $(MAIN) $(CONFIG) --gui
+
+#Run with GUI grid and manual turn steps.
+gui-step:
+	$(PYTHON) $(MAIN) $(CONFIG) --gui --step
 
 debug:
 	$(PYTHON) -m pdb $(MAIN) $(CONFIG)
