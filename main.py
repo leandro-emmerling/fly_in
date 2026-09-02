@@ -25,6 +25,7 @@ def parse_args() -> argparse.Namespace:
                         help="Run the gui interface")
     return parser.parse_args()
 
+
 def main() -> None:
     """Run the main program."""
     args = parse_args()
@@ -42,7 +43,6 @@ def main() -> None:
         else:
             terminal = TerminalDisplay(map)
             terminal.display_animated(turns, drone_states, args.step)
-
 
     except (ParserError, MapValidationError) as e:
         print(tc.colorize(f"Error: {e}", "red"))

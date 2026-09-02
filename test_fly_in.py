@@ -11,22 +11,23 @@ MAPS_DIR = Path(__file__).parent / "maps"
 PARSER_DIR = MAPS_DIR / "parser"
 PATHFINDER_DIR = MAPS_DIR / "pathfinder"
 
-def run_parser_tests():
+
+def run_parser_tests() -> None:
     tests = [
-    "test_dash_in_name.txt",
-    "test_invalid_zone_type.txt",
-    "test_duplicate_zone_name.txt",
-    "test_invalid_nb_drones.txt",
-    "test_unknown_zone_connection.txt",
-    "test_invalid_capacity.txt",
-    "test_missing_start.txt",
-    "test_missing_end.txt",
-    "test_missing_nb_drones.txt",
-    "test_duplicate_start.txt",
-    "test_duplicate_end.txt",
-    "test_zero_drones.txt",
-    "test_unknown_metadata_key.txt",
-    "test_self_connection.txt",
+        "test_dash_in_name.txt",
+        "test_invalid_zone_type.txt",
+        "test_duplicate_zone_name.txt",
+        "test_invalid_nb_drones.txt",
+        "test_unknown_zone_connection.txt",
+        "test_invalid_capacity.txt",
+        "test_missing_start.txt",
+        "test_missing_end.txt",
+        "test_missing_nb_drones.txt",
+        "test_duplicate_start.txt",
+        "test_duplicate_end.txt",
+        "test_zero_drones.txt",
+        "test_unknown_metadata_key.txt",
+        "test_self_connection.txt",
     ]
     print("\n=========== Parser Tests ===========\n")
     for filename in tests:
@@ -36,10 +37,12 @@ def run_parser_tests():
         except (ParserError, MapValidationError) as e:
             print(f"{filename}: {type(e).__name__} ({e})")
         except Exception as e:
-            print(f"!!! {filename}: unerwarteter Fehler: {type(e).__name__}: {e}")
+            print(f"!!! {filename}: "
+                  f"unerwarteter Fehler: {type(e).__name__}: {e}")
     print()
 
-def run_pathfinder_tests():
+
+def run_pathfinder_tests() -> None:
     tests = [
         "test_blocked_zone.txt",
         "test_no_path.txt"
@@ -54,11 +57,12 @@ def run_pathfinder_tests():
         except (PathNotFoundError, MapValidationError) as e:
             print(f"{filename}: {type(e).__name__} ({e})")
         except Exception as e:
-            print(f"!!! {filename}: unerwarteter Fehler: {type(e).__name__}: {e}")
+            print(f"!!! {filename}: "
+                  f"unerwarteter Fehler: {type(e).__name__}: {e}")
     print()
 
 
-def run_benchmark_tests():
+def run_benchmark_tests() -> None:
     maps = [
         ("maps/easy/01_linear_path.txt", 6),
         ("maps/easy/02_simple_fork.txt", 6),

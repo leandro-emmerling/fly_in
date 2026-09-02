@@ -9,12 +9,12 @@ from pathfinder import Pathfinder
 from simulation import MoveResult, Simulation
 
 
-
 class GuiDisplay:
     """To display the colored turn output and the grid build from the
     given Map object and displayed it in the an external GUI Window.
     """
     PADDING = 20
+
     def __init__(self, game_map: Map, step: bool = False) -> None:
         """Initialize the gui display class with the game_map.
 
@@ -29,7 +29,6 @@ class GuiDisplay:
         self.simulation = Simulation(game_map, self.pathfinder)
         self._setup_canvas()
         self._compute_grid_metrics()
-
 
     def _setup_canvas(self) -> None:
         self.canvas_width: int = 800
@@ -46,22 +45,22 @@ class GuiDisplay:
             self.next_button.pack(side="bottom", anchor="e")
 
     def _compute_grid_metrics(self) -> None:
-        self.min_x, self.min_y, self.max_x, self.max_y = self.map.get_grid_bounds()
-        self.grid_width: int = self.max_x - self.min_x + 1
-        self.grid_height: int = self.max_y - self.min_y + 1
+        self.min_x, self.min_y, max_x, max_y = self.map.get_grid_bounds()
+        self.grid_width: int = max_x - self.min_x + 1
+        self.grid_height: int = max_y - self.min_y + 1
         self.cell_size: float = min(
             (self.canvas_width - 2 * self.PADDING) / self.grid_width,
-            (self.canvas_height -2 * self.PADDING) / self.grid_height)
+            (self.canvas_height - 2 * self.PADDING) / self.grid_height)
         self.half_cs: float = self.cell_size / 2
 
     def _zone_to_pixel(self, zone: Zone) -> tuple[float, float]:
-            mid_x: float = ((zone.x - self.min_x) * self.cell_size
-                            + self.half_cs + self.PADDING)
-            mid_y: float = ((zone.y - self.min_y) * self.cell_size
-                            + self.half_cs + self.PADDING)
-            return mid_x, mid_y
+        mid_x: float = ((zone.x - self.min_x) * self.cell_size
+                        + self.half_cs + self.PADDING)
+        mid_y: float = ((zone.y - self.min_y) * self.cell_size
+                        + self.half_cs + self.PADDING)
+        return mid_x, mid_y
 
-    def _get_text_color(self, zone) -> str:
+    def _get_text_color(self, zone: Zone) -> str:
         if zone.color is None:
             return "black"
         r, g, b = self.root.winfo_rgb(zone.color)
@@ -71,19 +70,19 @@ class GuiDisplay:
         else:
             return "black"
 
-
     def _draw_grid(self) -> None:
         for i in range(self.grid_width + 1):
-            x: int = i * self.cell_size + self.PADDING
+            x: float = i * self.cell_size + self.PADDING
             self.canvas.create_line(
-                x, self.PADDING,
-                x, self.grid_height * self.cell_size + self.PADDING, fill="grey")
+                x, self.PADDING, x,
+                self.grid_height * self.cell_size + self.PADDING, fill="grey")
 
         for j in range(self.grid_height + 1):
-            y: int = j * self.cell_size + self.PADDING
+            y: float = j * self.cell_size + self.PADDING
             self.canvas.create_line(
                 self.PADDING, y,
-                self.grid_width * self.cell_size + self.PADDING, y, fill="grey")
+                self.grid_width * self.cell_size + self.PADDING,
+                y, fill="grey")
 
     def _draw_zones(self, shrink: int = 0) -> None:
         for zone in self.map.zones.values():
@@ -93,22 +92,29 @@ class GuiDisplay:
             x2: float = mid_x + (self.half_cs - shrink)
             y2: float = mid_y + (self.half_cs - shrink)
             self.canvas.create_rectangle(
-                x1, y1, x2, y2, fill=zone.color if zone.color else "white", outline="")
-            self.canvas.create_text(mid_x, mid_y - 20, text=zone.display_symbol(), fill=self._get_text_color(zone))
-            self.canvas.create_text(mid_x, mid_y - 8, text=zone.name, fill=self._get_text_color(zone))
+                x1, y1, x2, y2,
+                fill=zone.color if zone.color else "white", outline="")
+            self.canvas.create_text(
+                mid_x, mid_y - 20,
+                text=zone.display_symbol(), fill=self._get_text_color(zone))
+            self.canvas.create_text(
+                mid_x, mid_y - 8,
+                text=zone.name, fill=self._get_text_color(zone))
 
     def _draw_connections(self) -> None:
         for con in self.map.connections:
             x1, y1 = self._zone_to_pixel(con.zone_a)
             x2, y2 = self._zone_to_pixel(con.zone_b)
             self.canvas.create_line(
-                x1, y1, (x1 + x2) / 2, (y1 + y2) / 2 , width=4, fill=con.zone_b.color if con.zone_b.color else "white")
+                x1, y1, (x1 + x2) / 2, (y1 + y2) / 2, width=4,
+                fill=con.zone_b.color if con.zone_b.color else "white")
             self.canvas.create_line(
-                (x1 + x2) / 2, (y1 + y2) / 2 ,x2 , y2, width=4, fill=con.zone_a.color if con.zone_a.color else "white")
+                (x1 + x2) / 2, (y1 + y2) / 2, x2, y2, width=4,
+                fill=con.zone_a.color if con.zone_a.color else "white")
 
     def display_animated(
         self, turns: list[list[MoveResult]],
-        drone_states: list[dict[str, Zone]]) -> None:
+            drone_states: list[dict[str, Zone]]) -> None:
         """Displays the simulation turn by turn with an animated grid.
 
         Args:
@@ -139,9 +145,10 @@ class GuiDisplay:
                 mid_x = (x1 + x2) / 2
                 mid_y = (y1 + y2) / 2
                 self.canvas.create_oval(mid_x - 20, mid_y - 20 + 22,
-                                    mid_x + 20, mid_y + 20 + 16,
-                                    fill="lightgrey", outline="black")
-                self.canvas.create_text(mid_x, mid_y + 16, text=move.drone_id, fill="black")
+                                        mid_x + 20, mid_y + 20 + 16,
+                                        fill="lightgrey", outline="black")
+                self.canvas.create_text(
+                    mid_x, mid_y + 16, text=move.drone_id, fill="black")
         label_text = f"Turn {self.turn_index}: " + " ".join(formatted_moves)
         self.label.config(text=label_text)
         self._draw_drones(in_transit)
@@ -176,11 +183,13 @@ class GuiDisplay:
         if move.zone is not None:
             zone = move.zone
             return f"{move.drone_id}-{zone.name}"
-        else:
+        elif move.connection is not None:
             connection = move.connection
             zone_a = connection.zone_a
             zone_b = connection.zone_b
             return f"{move.drone_id}-{zone_a.name}-{zone_b.name}"
+        else:
+            raise ValueError("Invalid MoveResult")
 
     def run(self) -> None:
         self.root.mainloop()
@@ -191,4 +200,3 @@ if __name__ == "__main__":
     map = file_parser.parse("config.txt")
     gd = GuiDisplay(map)
     gd.run()
-

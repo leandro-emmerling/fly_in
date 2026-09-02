@@ -36,13 +36,15 @@ class TerminalDisplay:
             zone = move.zone
             return (f"{drone_part}-"
                     f"{self.colors.colorize(zone.name, zone.color)}")
-        else:
+        elif move.connection is not None:
             connection = move.connection
             zone_a = connection.zone_a
             zone_b = connection.zone_b
             return (f"{drone_part}-"
                     f"{self.colors.colorize(zone_a.name, zone_a.color)}-"
                     f"{self.colors.colorize(zone_b.name, zone_b.color)}")
+        else:
+            raise ValueError("Invalid MoveResult")
 
     def display_turns(self, turns: list[list[MoveResult]]) -> None:
         """Prints each turn's movements as a colored, formatted line.
@@ -55,7 +57,8 @@ class TerminalDisplay:
             print(f"Turn {turn_number}:", *formatted_moves)
 
     def _draw_connections(
-        self, grid: list[list[str]], min_x: int, min_y: int) -> None:
+        self, grid: list[list[str]], min_x: int, min_y: int
+            ) -> None:
         for connection in self.map.connections:
             x1 = connection.zone_a.x - min_x
             y1 = connection.zone_a.y - min_y
@@ -116,7 +119,8 @@ class TerminalDisplay:
 
     def display_animated(
         self, turns: list[list[MoveResult]],
-        drone_states: list[dict[str, Zone]], step: bool = False) -> None:
+        drone_states: list[dict[str, Zone]], step: bool = False
+            ) -> None:
         """Displays the simulation turn by turn with an animated grid.
 
         Args:
