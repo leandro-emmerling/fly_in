@@ -13,6 +13,11 @@ PATHFINDER_DIR = MAPS_DIR / "pathfinder"
 
 
 def run_parser_tests() -> None:
+    """Runs all parser error tests and prints the result per file.
+
+    Each test file is expected to trigger a ParserError or
+    MapValidationError. Unexpected exceptions are flagged seperately.
+    """
     tests = [
         "test_dash_in_name.txt",
         "test_invalid_zone_type.txt",
@@ -43,6 +48,11 @@ def run_parser_tests() -> None:
 
 
 def run_pathfinder_tests() -> None:
+    """Runs all pathfinder error tests and prints the result per file.
+
+    Each test file is expected to trigger a PathNotFoundError when
+    no valid path exists between start and end zone.
+    """
     tests = [
         "test_blocked_zone.txt",
         "test_no_path.txt"
@@ -63,6 +73,12 @@ def run_pathfinder_tests() -> None:
 
 
 def run_benchmark_tests() -> None:
+    """Runs all benchmark maps and checks against the target turn counts.
+
+    Compares the simulation result against the performance targets
+    defined in the subject (VII.7) for easy, medium, hard and
+    challenger maps.
+    """
     maps = [
         ("maps/easy/01_linear_path.txt", 6),
         ("maps/easy/02_simple_fork.txt", 6),

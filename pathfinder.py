@@ -16,8 +16,15 @@ class AdjacencyEntry(NamedTuple):
 
 
 class Pathfinder:
-    """..."""
-    def __init__(self, game_map: Map):
+    """Find and return the cheapest path with each zone and
+    its reachable neighbors.
+    """
+    def __init__(self, game_map: Map) -> None:
+        """Initialize the Pathfinder with the given map and build the adjacency list.
+
+        Args:
+            game_map: The map containing zones and connections to navigate.
+        """
         self.map = game_map
         self.adjacency = self._build_adjacency()
 
@@ -54,7 +61,7 @@ class Pathfinder:
                     continue
                 new_cost: float = distances[current][0] + entry.cost
                 new_priority_score = (
-                    distances[current][1] + (
+                    distances[cusrrent][1] + (
                         -1 if entry.neighbor.is_prioritised() else 0)
                     )
                 new_total = (new_cost, new_priority_score)

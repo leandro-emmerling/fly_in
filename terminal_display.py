@@ -59,6 +59,13 @@ class TerminalDisplay:
     def _draw_connections(
         self, grid: list[list[str]], min_x: int, min_y: int
             ) -> None:
+        """Prints each connection from it's zone_a to zone_b.
+
+        Args:
+            grid: A 2D grid with each row and each column.
+            min_x (int): Smallest X value of every zone.
+            min_y (int): Smallest Y value of every zone.
+        """
         for connection in self.map.connections:
             x1 = connection.zone_a.x - min_x
             y1 = connection.zone_a.y - min_y

@@ -7,7 +7,7 @@ from error import MapValidationError
 
 
 class Map:
-    """Class 'Map' to generate a ... Objekt"""
+    """Class 'Map' to verify the map objekt"""
     def __init__(
         self, nb_drones: int, zones: dict[str, Zone],
         connections: list[Connection], start: Zone, end: Zone

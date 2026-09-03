@@ -3,7 +3,6 @@
 
 class MapValidationError(Exception):
     """Raised when a Map object fails its consistency checks."""
-    pass
 
 
 class ParserError(Exception):

@@ -97,7 +97,7 @@ class Parser:
 
     def _parse_zone(self, line: str, line_number: int, prefix: str) -> None:
         """Parses the raw string of the zone and
-            creates a validated Zone object.
+        creates a validated Zone object.
 
         Args:
             line: Raw string from the config file.
@@ -183,7 +183,7 @@ class Parser:
     def _parse_connection(
             self, line: str, line_number: int,  _prefix: str) -> None:
         """Parses the raw string of the connection and
-            creates a validated Connection object.
+        creates a validated Connection object.
 
         Args:
             line: Raw string from the config file.

@@ -31,6 +31,7 @@ class GuiDisplay:
         self._compute_grid_metrics()
 
     def _setup_canvas(self) -> None:
+        """Sets up the tkinter canvas, label and optional step button."""
         self.canvas_width: int = 800
         self.canvas_height: int = 600
         self.canvas = tk.Canvas(
@@ -45,6 +46,7 @@ class GuiDisplay:
             self.next_button.pack(side="bottom", anchor="e")
 
     def _compute_grid_metrics(self) -> None:
+        """Computes cell size and grid dimensions based on zone coordinates."""
         self.min_x, self.min_y, max_x, max_y = self.map.get_grid_bounds()
         self.grid_width: int = max_x - self.min_x + 1
         self.grid_height: int = max_y - self.min_y + 1
@@ -54,6 +56,14 @@ class GuiDisplay:
         self.half_cs: float = self.cell_size / 2
 
     def _zone_to_pixel(self, zone: Zone) -> tuple[float, float]:
+        """Converts zone grid coordinates to pixel coordinates on the canvas.
+
+        Args:
+            zone: The zone to convert.
+
+        Returns:
+            A tuple of (x, y) pixel coordinates for the zone center.
+        """
         mid_x: float = ((zone.x - self.min_x) * self.cell_size
                         + self.half_cs + self.PADDING)
         mid_y: float = ((zone.y - self.min_y) * self.cell_size
@@ -61,6 +71,14 @@ class GuiDisplay:
         return mid_x, mid_y
 
     def _get_text_color(self, zone: Zone) -> str:
+        """Returns black or white text color based on the zone background brightness.
+
+        Args:
+            zone: The zone whose color is evaluated.
+
+        Returns:
+            'white' for dark backgrounds, 'black' for light backgrounds.
+        """
         if zone.color is None:
             return "black"
         r, g, b = self.root.winfo_rgb(zone.color)
@@ -71,12 +89,12 @@ class GuiDisplay:
             return "black"
 
     def _draw_grid(self) -> None:
+        """Draws the background grid lines on the canvas."""
         for i in range(self.grid_width + 1):
             x: float = i * self.cell_size + self.PADDING
             self.canvas.create_line(
                 x, self.PADDING, x,
                 self.grid_height * self.cell_size + self.PADDING, fill="grey")
-
         for j in range(self.grid_height + 1):
             y: float = j * self.cell_size + self.PADDING
             self.canvas.create_line(
@@ -85,6 +103,11 @@ class GuiDisplay:
                 y, fill="grey")
 
     def _draw_zones(self, shrink: int = 0) -> None:
+        """Draws all zones as colored rectangles with their name and symbol.
+
+        Args:
+            shrink: Pixel amount to shrink the rectangle on each side.
+        """
         for zone in self.map.zones.values():
             mid_x, mid_y = self._zone_to_pixel(zone)
             x1: float = mid_x - (self.half_cs - shrink)
@@ -102,6 +125,7 @@ class GuiDisplay:
                 text=zone.name, fill=self._get_text_color(zone))
 
     def _draw_connections(self) -> None:
+        """Draws connections between zones as two-colored lines."""
         for con in self.map.connections:
             x1, y1 = self._zone_to_pixel(con.zone_a)
             x2, y2 = self._zone_to_pixel(con.zone_b)
@@ -128,6 +152,7 @@ class GuiDisplay:
         self._animate()
 
     def _animate(self) -> None:
+        """Renders the current turn and schedules or waits for the next."""
         self.canvas.delete("all")
         self._draw_grid()
         self._draw_zones(0)
@@ -161,6 +186,11 @@ class GuiDisplay:
             self.next_button.config(state="disabled")
 
     def _draw_drones(self, in_transit: set[str]) -> None:
+        """Draws drone indicators on their current zones, skipping in-transit drones.
+
+        Args:
+            in_transit: Set of drone IDs currently traversing a connection.
+        """
         for id, zone in self.drone_states[self.turn_index - 1].items():
             if id in in_transit:
                 continue
@@ -192,11 +222,5 @@ class GuiDisplay:
             raise ValueError("Invalid MoveResult")
 
     def run(self) -> None:
+        """Run the main Programm"""
         self.root.mainloop()
-
-
-if __name__ == "__main__":
-    file_parser = Parser()
-    map = file_parser.parse("config.txt")
-    gd = GuiDisplay(map)
-    gd.run()
