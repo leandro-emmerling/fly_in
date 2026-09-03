@@ -20,7 +20,8 @@ class Pathfinder:
     its reachable neighbors.
     """
     def __init__(self, game_map: Map) -> None:
-        """Initialize the Pathfinder with the given map and build the adjacency list.
+        """Initialize the Pathfinder with the given
+        map and build the adjacency list.
 
         Args:
             game_map: The map containing zones and connections to navigate.
@@ -61,7 +62,7 @@ class Pathfinder:
                     continue
                 new_cost: float = distances[current][0] + entry.cost
                 new_priority_score = (
-                    distances[cusrrent][1] + (
+                    distances[current][1] + (
                         -1 if entry.neighbor.is_prioritised() else 0)
                     )
                 new_total = (new_cost, new_priority_score)

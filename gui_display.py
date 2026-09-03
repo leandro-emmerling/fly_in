@@ -4,7 +4,6 @@
 import tkinter as tk
 from map import Map
 from zone import Zone
-from parser import Parser
 from pathfinder import Pathfinder
 from simulation import MoveResult, Simulation
 
@@ -71,7 +70,8 @@ class GuiDisplay:
         return mid_x, mid_y
 
     def _get_text_color(self, zone: Zone) -> str:
-        """Returns black or white text color based on the zone background brightness.
+        """Returns black or white text color based
+        on the zone background brightness.
 
         Args:
             zone: The zone whose color is evaluated.
@@ -186,7 +186,8 @@ class GuiDisplay:
             self.next_button.config(state="disabled")
 
     def _draw_drones(self, in_transit: set[str]) -> None:
-        """Draws drone indicators on their current zones, skipping in-transit drones.
+        """Draws drone indicators on their current zones,
+        skipping in-transit drones.
 
         Args:
             in_transit: Set of drone IDs currently traversing a connection.
