@@ -36,13 +36,14 @@ def main() -> None:
         pathfinder = Pathfinder(map)
         simulation = Simulation(map, pathfinder)
         turns, drone_states = simulation.run()
+        stats = simulation.get_stats(turns)
         if args.gui:
             gui = GuiDisplay(map, args.step)
-            gui.display_animated(turns, drone_states)
+            gui.display_animated(turns, drone_states, stats)
             gui.run()
         else:
             terminal = TerminalDisplay(map)
-            terminal.display_animated(turns, drone_states, args.step)
+            terminal.display_animated(turns, drone_states, stats, args.step)
 
     except (ParserError, MapValidationError) as e:
         print(tc.colorize(f"Error: {e}", "red"))

@@ -4,8 +4,7 @@
 import tkinter as tk
 from map import Map
 from zone import Zone
-from pathfinder import Pathfinder
-from simulation import MoveResult, Simulation
+from simulation import MoveResult, SimulationStats
 
 
 class GuiDisplay:
@@ -24,8 +23,6 @@ class GuiDisplay:
         self.root = tk.Tk()
         self.root.title("Fly_in")
         self.map = game_map
-        self.pathfinder = Pathfinder(game_map)
-        self.simulation = Simulation(game_map, self.pathfinder)
         self._setup_canvas()
         self._compute_grid_metrics()
 
@@ -138,17 +135,20 @@ class GuiDisplay:
 
     def display_animated(
         self, turns: list[list[MoveResult]],
-            drone_states: list[dict[str, Zone]]) -> None:
+            drone_states: list[dict[str, Zone]], stats: SimulationStats,
+            ) -> None:
         """Displays the simulation turn by turn with an animated grid.
 
         Args:
             turns: The list of turns from Simulation.run()
             drone_states: A list of drone position snapshots, one per turn.
+            stats: A NameTuple with information about the complete simulation.
         """
         self.turn_index: int = 0
         if self.turn_index == 0:
             self.turns = turns
             self.drone_states = drone_states
+            self.stats = stats
         self._animate()
 
     def _animate(self) -> None:
@@ -184,6 +184,12 @@ class GuiDisplay:
                 self.root.after(1000, self._animate)
         elif self.turn_index == len(self.turns) and self.step:
             self.next_button.config(state="disabled")
+        if self.turn_index == len(self.turns):
+            label_text += (f"\nTotal turns: {self.stats.total_turns} | "
+                            f"Average turns per drone: {self.stats.average_per_drone:.2f} | "
+                            f"Total costs: {self.stats.total_costs}")
+            self.label.config(text=label_text)
+
 
     def _draw_drones(self, in_transit: set[str]) -> None:
         """Draws drone indicators on their current zones,

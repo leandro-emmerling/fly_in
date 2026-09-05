@@ -109,7 +109,7 @@ The simulation proceeds in discrete turns. At each turn, every drone attempts to
 **Terminal mode** (`display.py`):
 - Turn-by-turn colored output using ANSI escape codes, with zone names in their configured color and drone IDs in a distinct drone color.
 - Animated grid drawn with Unicode box-drawing characters, showing zone symbols, connection dots (interpolated between zone positions, alternating colors), drone counts per zone, and highlighted start (`S`) / end (`E`) zones.
-- `--step` flag for manual turn-by-turn stepping.
+- `step` flag for manual turn-by-turn stepping.
 
 **GUI mode** (`gui_display.py`):
 - Built with `tkinter` (Python standard library, no additional dependencies).
@@ -117,6 +117,8 @@ The simulation proceeds in discrete turns. At each turn, every drone attempts to
 - Connections drawn as two-color lines (each half in the color of its respective zone).
 - Drones displayed as labeled circles on their current zone, or at the midpoint of a connection when in transit.
 - Supports both automatic (1s/turn) and manual step mode.
+
+- Both representations end with a summary of stats of the Simulation (Total turns, average turns per drone, total costs)
 
 ## Resources
 

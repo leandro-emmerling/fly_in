@@ -21,6 +21,16 @@ class MoveResult(NamedTuple):
     connection: Connection | None
 
 
+class SimulationStats(NamedTuple):
+    """Information about the complete simulation.
+
+    Contains the turns in total, the average turns per drone and
+    the turn costs of the path in total."""
+    total_turns: int
+    average_per_drone: float
+    total_costs: int
+
+
 class Simulation:
     """Simulate the different drones depending on the connections"""
     def __init__(self, game_map: Map, pathfinder: Pathfinder) -> None:
@@ -179,3 +189,21 @@ class Simulation:
             else:
                 new_occupancy[con] = 0
         return new_occupancy
+
+    def get_stats(self, turns: list[list[MoveResult]]) -> SimulationStats:
+        """Calculates and return different
+        Stats for the output representation.
+
+        Args:
+            turns: A list of all turns from simulation.run()
+
+        Returns:
+            A named tuple with total_turns, average_per_drone and total_costs.
+        """
+        sum_costs: int = 0
+        for zone_list in self.paths.values():
+            sum_costs += sum(zone.movement_cost() for zone in zone_list[1:])
+        return SimulationStats(
+            total_turns=len(turns),
+            average_per_drone=len(turns) / self.map.nb_drones,
+            total_costs=sum_costs)
