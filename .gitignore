@@ -1,0 +1,7 @@
+__pycache__/
+.mypy_cache/
+.pytest_cache
+config.txt
+/venv
+/maps
+test_fly_in.py
