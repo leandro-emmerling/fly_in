@@ -12,6 +12,7 @@ class GuiDisplay:
     given Map object and displayed it in the an external GUI Window.
     """
     PADDING = 20
+    FONT = ("Helvetica", 10, "bold")
 
     def __init__(self, game_map: Map, step: bool = False) -> None:
         """Initialize the gui display class with the game_map.
@@ -22,6 +23,7 @@ class GuiDisplay:
         self.step = step
         self.root = tk.Tk()
         self.root.title("Fly_in")
+        self.root.configure(bg="#1e1e2e")
         self.map = game_map
         self._setup_canvas()
         self._compute_grid_metrics()
@@ -32,13 +34,15 @@ class GuiDisplay:
         self.canvas_height: int = 600
         self.canvas = tk.Canvas(
             self.root, width=self.canvas_width,
-            height=self.canvas_height, bg="gray75")
+            height=self.canvas_height, bg="#1e1e2e")
         self.canvas.pack()
-        self.label = tk.Label(self.root, text="")
-        self.label.pack()
+        self.label = tk.Label(
+            self.root, bg="#1e1e2e", fg="white", text="")
+        self.label.pack(pady=5)
         if self.step:
             self.next_button = tk.Button(
-                self.root, text="Next Turn", command=self._animate)
+                self.root, bg="#1e1e2e", fg="white",
+                text="Next Turn", font=self.FONT, command=self._animate)
             self.next_button.pack(side="bottom", anchor="e")
 
     def _compute_grid_metrics(self) -> None:
@@ -115,10 +119,10 @@ class GuiDisplay:
                 x1, y1, x2, y2,
                 fill=zone.color if zone.color else "white", outline="")
             self.canvas.create_text(
-                mid_x, mid_y - 20,
+                mid_x, mid_y - 20, font=("Helvetica", 10, "bold"),
                 text=zone.display_symbol(), fill=self._get_text_color(zone))
             self.canvas.create_text(
-                mid_x, mid_y - 8,
+                mid_x, mid_y - 8, font=("Helvetica", 10, "bold"),
                 text=zone.name, fill=self._get_text_color(zone))
 
     def _draw_connections(self) -> None:
@@ -173,9 +177,10 @@ class GuiDisplay:
                                         mid_x + 20, mid_y + 20 + 16,
                                         fill="lightgrey", outline="black")
                 self.canvas.create_text(
-                    mid_x, mid_y + 16, text=move.drone_id, fill="black")
+                    mid_x, mid_y + 22, text=move.drone_id,
+                    font=self.FONT, fill="black")
         label_text = f"Turn {self.turn_index}: " + " ".join(formatted_moves)
-        self.label.config(text=label_text)
+        self.label.config(text=label_text, font=self.FONT)
         self._draw_drones(in_transit)
         if self.turn_index < len(self.turns):
             if self.step:
@@ -189,7 +194,7 @@ class GuiDisplay:
                 f"\nTotal turns: {self.stats.total_turns} | "
                 f"Average turns per drone: {self.stats.average_per_drone:.2f}"
                 f" | Total costs: {self.stats.total_costs}")
-            self.label.config(text=label_text)
+            self.label.config(text=label_text, font=self.FONT)
 
     def _draw_drones(self, in_transit: set[str]) -> None:
         """Draws drone indicators on their current zones,
@@ -206,7 +211,8 @@ class GuiDisplay:
             self.canvas.create_oval(mid_x - radius, mid_y - radius + 22,
                                     mid_x + radius, mid_y + radius + 16,
                                     fill="lightgrey", outline="black")
-            self.canvas.create_text(mid_x, mid_y + 16, text=id, fill="black")
+            self.canvas.create_text(
+                mid_x, mid_y + 22, text=id, font=self.FONT, fill="black")
 
     def _format_moves(self, move: MoveResult) -> str:
         """Formats a single MoveResult into a output string.
