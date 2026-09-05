@@ -185,11 +185,11 @@ class GuiDisplay:
         elif self.turn_index == len(self.turns) and self.step:
             self.next_button.config(state="disabled")
         if self.turn_index == len(self.turns):
-            label_text += (f"\nTotal turns: {self.stats.total_turns} | "
-                            f"Average turns per drone: {self.stats.average_per_drone:.2f} | "
-                            f"Total costs: {self.stats.total_costs}")
+            label_text += (
+                f"\nTotal turns: {self.stats.total_turns} | "
+                f"Average turns per drone: {self.stats.average_per_drone:.2f}"
+                f" | Total costs: {self.stats.total_costs}")
             self.label.config(text=label_text)
-
 
     def _draw_drones(self, in_transit: set[str]) -> None:
         """Draws drone indicators on their current zones,
