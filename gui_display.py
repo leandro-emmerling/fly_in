@@ -19,6 +19,8 @@ class GuiDisplay:
 
         Args:
             game_map: The given map to pass all the required information.
+            step: True or false if the program
+                runs automatic or in manuel steps.
         """
         self.step = step
         self.root = tk.Tk()
