@@ -46,4 +46,4 @@ lint:
 
 lint-strict:
 	$(FLAKE8) . --exclude=$(EXCLUDE)
-	$(MYPY) . --exclude=$(EXCLUDE)--strict
+	$(MYPY) . --exclude=$(EXCLUDE) --strict
