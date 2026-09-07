@@ -14,8 +14,6 @@ class Drone:
             drone_id: Number to identify every drone.
             current_zone: The actual zone the drone is in.
             target: The end zone where the drone will fly to.
-            in_transit_to: State of the drone if
-                its in transit to restricted Zone.
         """
         self.drone_id: str = drone_id
         self.current_zone: Zone = current_zone
