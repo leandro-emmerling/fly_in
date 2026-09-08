@@ -82,14 +82,12 @@ class GuiDisplay:
         Returns:
             'white' for dark backgrounds, 'black' for light backgrounds.
         """
-        if zone.color is None:
+        color = self._get_zone_color(zone)
+        if color == "white":
             return "black"
-        r, g, b = self.root.winfo_rgb(zone.color)
+        r, g, b = self.root.winfo_rgb(color)
         brightness = 0.299 * r + 0.587 * g + 0.114 * b
-        if brightness < 32767:
-            return "white"
-        else:
-            return "black"
+        return "white" if brightness < 32767 else "black"
 
     def _draw_grid(self) -> None:
         """Draws the background grid lines on the canvas."""
@@ -119,7 +117,7 @@ class GuiDisplay:
             y2: float = mid_y + (self.half_cs - shrink)
             self.canvas.create_rectangle(
                 x1, y1, x2, y2,
-                fill=zone.color if zone.color else "white", outline="")
+                fill=self._get_zone_color(zone), outline="black")
             self.canvas.create_text(
                 mid_x, mid_y - 20, font=("Helvetica", 10, "bold"),
                 text=zone.display_symbol(), fill=self._get_text_color(zone))
@@ -134,10 +132,10 @@ class GuiDisplay:
             x2, y2 = self._zone_to_pixel(con.zone_b)
             self.canvas.create_line(
                 x1, y1, (x1 + x2) / 2, (y1 + y2) / 2, width=4,
-                fill=con.zone_b.color if con.zone_b.color else "white")
+                fill=self._get_zone_color(con.zone_b))
             self.canvas.create_line(
                 (x1 + x2) / 2, (y1 + y2) / 2, x2, y2, width=4,
-                fill=con.zone_a.color if con.zone_a.color else "white")
+                fill=self._get_zone_color(con.zone_a))
 
     def display_animated(
         self, turns: list[list[MoveResult]],
@@ -161,9 +159,9 @@ class GuiDisplay:
         """Renders the current turn and schedules or waits for the next."""
         self.canvas.delete("all")
         self._draw_grid()
-        self._draw_zones(0)
+        self._draw_zones(8)
         self._draw_connections()
-        self._draw_zones(10)
+        self._draw_zones(15)
         self.turn_index += 1
         formatted_moves = []
         in_transit: set[str] = set()
@@ -236,6 +234,23 @@ class GuiDisplay:
         else:
             raise ValueError("Invalid MoveResult")
 
+    def _get_zone_color(self, zone: Zone) -> str:
+        """Returns the zone color if known to tkinter, otherwise white.
+
+        Args:
+            zone: The zone whose color is checked.
+
+        Returns:
+            The zone color string if valid, otherwise 'white'.
+        """
+        if zone.color is None:
+            return "white"
+        try:
+            self.root.winfo_rgb(zone.color)
+            return zone.color
+        except tk.TclError:
+            return "white"
+  
     def run(self) -> None:
         """Run the main Programm"""
         self.root.mainloop()
