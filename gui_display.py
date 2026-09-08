@@ -27,19 +27,18 @@ class GuiDisplay:
         self.root.title("Fly_in")
         self.root.configure(bg="#1e1e2e")
         self.map = game_map
-        self._setup_canvas()
         self._compute_grid_metrics()
+        self._setup_canvas()
+
 
     def _setup_canvas(self) -> None:
         """Sets up the tkinter canvas, label and optional step button."""
-        self.canvas_width: int = 800
-        self.canvas_height: int = 600
         self.canvas = tk.Canvas(
             self.root, width=self.canvas_width,
             height=self.canvas_height, bg="#1e1e2e")
         self.canvas.pack()
         self.label = tk.Label(
-            self.root, bg="#1e1e2e", fg="white", text="")
+            self.root, bg="#1e1e2e", fg="white", text="", wraplength=800)
         self.label.pack(pady=5)
         if self.step:
             self.next_button = tk.Button(
@@ -49,9 +48,20 @@ class GuiDisplay:
 
     def _compute_grid_metrics(self) -> None:
         """Computes cell size and grid dimensions based on zone coordinates."""
+        self.canvas_width: int = 800
+        self.canvas_height: int = 600
         self.min_x, self.min_y, max_x, max_y = self.map.get_grid_bounds()
         self.grid_width: int = max_x - self.min_x + 1
         self.grid_height: int = max_y - self.min_y + 1
+        screen_width: int = self.root.winfo_screenwidth()
+        screen_height: int = self.root.winfo_screenheight()
+        if self.grid_width > 10:
+            self.canvas_width = min(
+                self.canvas_width * (self.grid_width / 7), screen_width - 100)
+        if self.grid_height > 8:
+            self.canvas_height = min(
+                self.canvas_height * (
+                    self.grid_height / 7), screen_height - 200)
         self.cell_size: float = min(
             (self.canvas_width - 2 * self.PADDING) / self.grid_width,
             (self.canvas_height - 2 * self.PADDING) / self.grid_height)
