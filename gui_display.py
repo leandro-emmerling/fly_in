@@ -45,7 +45,8 @@ class GuiDisplay:
                 text="Next Turn", font=self.FONT, command=self._animate)
             self.next_button.pack(side="bottom", anchor="e")
         self.root.bind(
-            "<Return>", lambda e: self._animate() if self.step else None)
+            "<Return>", lambda e: self._animate() if self.step and
+            self.turn_index < len(self.turns) else None)
         self.root.bind("<Escape>", lambda e: self.root.destroy())
 
     def _compute_grid_metrics(self) -> None:
