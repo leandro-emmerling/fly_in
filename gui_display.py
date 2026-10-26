@@ -30,7 +30,6 @@ class GuiDisplay:
         self._compute_grid_metrics()
         self._setup_canvas()
 
-
     def _setup_canvas(self) -> None:
         """Sets up the tkinter canvas, label and optional step button."""
         self.canvas = tk.Canvas(
@@ -45,6 +44,9 @@ class GuiDisplay:
                 self.root, bg="#1e1e2e", fg="white",
                 text="Next Turn", font=self.FONT, command=self._animate)
             self.next_button.pack(side="bottom", anchor="e")
+        self.root.bind(
+            "<Return>", lambda e: self._animate() if self.step else None)
+        self.root.bind("<Escape>", lambda e: self.root.destroy())
 
     def _compute_grid_metrics(self) -> None:
         """Computes cell size and grid dimensions based on zone coordinates."""
@@ -56,12 +58,12 @@ class GuiDisplay:
         screen_width: int = self.root.winfo_screenwidth()
         screen_height: int = self.root.winfo_screenheight()
         if self.grid_width > 10:
-            self.canvas_width = min(
-                self.canvas_width * (self.grid_width / 7), screen_width - 100)
+            self.canvas_width = int(min(
+                self.canvas_width * (self.grid_width / 7), screen_width - 100))
         if self.grid_height > 8:
-            self.canvas_height = min(
+            self.canvas_height = int(min(
                 self.canvas_height * (
-                    self.grid_height / 7), screen_height - 200)
+                    self.grid_height / 7), screen_height - 200))
         self.cell_size: float = min(
             (self.canvas_width - 2 * self.PADDING) / self.grid_width,
             (self.canvas_height - 2 * self.PADDING) / self.grid_height)
@@ -260,7 +262,7 @@ class GuiDisplay:
             return zone.color
         except tk.TclError:
             return "white"
-  
+
     def run(self) -> None:
         """Run the main Programm"""
         self.root.mainloop()
